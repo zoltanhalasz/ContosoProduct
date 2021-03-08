@@ -23,7 +23,15 @@ namespace ContosoCrafts.WebSite.Services
 
         public IEnumerable<Product> GetProducts()
         {
-            using(var jsonFileReader = File.OpenText(JsonFileName))
+
+            var fileContent = File.ReadLines(JsonFileName).ToList();
+            if (fileContent[fileContent.Count - 1]=="]]")
+            {
+                fileContent[fileContent.Count - 1] = "]";
+                File.WriteAllLines(JsonFileName, fileContent);
+            }
+
+            using (var jsonFileReader = File.OpenText(JsonFileName))
             {
                 return JsonSerializer.Deserialize<Product[]>(jsonFileReader.ReadToEnd(),
                     new JsonSerializerOptions
@@ -60,6 +68,45 @@ namespace ContosoCrafts.WebSite.Services
                 );
             }
         }
+
+        public void DeleteProduct(string productId)
+        {
+            var products = GetProducts();
+            
+            products.First(x => x.Id == productId).isDeleted = true;            
+
+            using (var outputStream = File.OpenWrite(JsonFileName))
+            {
+                JsonSerializer.Serialize<IEnumerable<Product>>(
+                    new Utf8JsonWriter(outputStream, new JsonWriterOptions
+                    {
+                        SkipValidation = true,
+                        Indented = true
+                    }),
+                    products
+                );
+            }
+        }
+
+        public void UnDeleteProduct(string productId)
+        {
+            var products = GetProducts();
+
+            products.First(x => x.Id == productId).isDeleted = false;
+
+            using (var outputStream = File.OpenWrite(JsonFileName))
+            {
+                JsonSerializer.Serialize<IEnumerable<Product>>(
+                    new Utf8JsonWriter(outputStream, new JsonWriterOptions
+                    {
+                        SkipValidation = true,
+                        Indented = true
+                    }),
+                    products
+                );
+            }
+        }
+
     }
 
 }

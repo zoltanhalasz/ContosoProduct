@@ -1,0 +1,70 @@
+@using ContosoCrafts.WebSite.Models
+@using ContosoCrafts.WebSite.Services
+@using Microsoft.AspNetCore.Components.Web
+@inject JsonFileProductService ProductService
+
+<table class="table-responsive-sm table-bordered" >
+    <thead>
+        <tr>
+            <td>
+                Title
+            </td>
+            <td>
+                Description
+            </td>
+            <td>
+
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Products)
+        {
+            <tr>
+                <td>
+                    @product.Title
+                </td>
+                <td>
+                    @product.Description
+                </td>
+                <td>
+                    @if (product.isDeleted)
+                    {
+                        <button @onclick="(e => UnDeleteProduct(product.Id))"
+                                class="btn btn-success">
+                            Undelete
+                        </button>
+                    }
+                </td>
+            </tr>               
+               
+        }
+    </tbody>
+</table>
+
+
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+@code 
+{
+
+    List<Product> Products;
+
+    protected override void OnInitialized()
+    {
+        Products = ProductService.GetProducts().ToList();
+    }
+
+
+
+    void UnDeleteProduct (string productId)
+    {
+        ProductService.UnDeleteProduct(productId);
+        Products = ProductService.GetProducts().ToList();
+    }
+
+
+}

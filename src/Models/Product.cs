@@ -17,6 +17,7 @@ namespace ContosoCrafts.WebSite.Models
 
         public override string ToString() => JsonSerializer.Serialize<Product>(this);
 
- 
+        [JsonPropertyName("isDeleted")]
+        public bool isDeleted { get; set; }
     }
 }
